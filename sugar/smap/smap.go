@@ -1,4 +1,4 @@
-package sugar
+package smap
 
 import "sync"
 
