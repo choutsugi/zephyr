@@ -1,8 +1,6 @@
 package rotatelog
 
 import (
-	"fmt"
-	"path/filepath"
 	"time"
 )
 
@@ -26,6 +24,6 @@ func WithCurLogLinkPath(linkPath string) Option {
 func WithDeleteExpiredFile(maxAge time.Duration, fileWildcard string) Option {
 	return func(r *RotateLog) {
 		r.maxAge = maxAge
-		r.delFileWildcard = fmt.Sprintf("%s%s%s", filepath.Dir(r.logPath), string([]byte{filepath.Separator}), fileWildcard)
+		r.delFileWildcard = fileWildcard
 	}
 }

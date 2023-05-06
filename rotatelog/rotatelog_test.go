@@ -23,7 +23,7 @@ func TestRotateLog(t *testing.T) {
 		"./log/log.debug.20060102",
 		WithRotateTime(time.Hour*24),
 		WithCurLogLinkPath("./log/log.debug"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.debug.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.debug.*.*"),
 	)
 	if err != nil {
 		panic(err)
@@ -33,7 +33,7 @@ func TestRotateLog(t *testing.T) {
 		"./log/log.info.20060102",
 		WithRotateTime(time.Hour*24),
 		WithCurLogLinkPath("./log/log.info"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.info.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.info.*.*"),
 	)
 	if err != nil {
 		panic(err)
@@ -43,7 +43,7 @@ func TestRotateLog(t *testing.T) {
 		"./log/log.error.20060102",
 		WithRotateTime(time.Hour*24),
 		WithCurLogLinkPath("./log/log.error"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.error.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.error.*.*"),
 	)
 	if err != nil {
 		panic(err)

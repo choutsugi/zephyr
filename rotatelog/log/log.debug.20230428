@@ -1,2 +1,0 @@
-2023-04-28T16:17:20.996+0800	INFO	rotatelog/rotatelog_test.go:50	hello, time=2023-04-28 16:17:20
-2023-04-28T16:17:20.996+0800	INFO	rotatelog/rotatelog_test.go:51	hello, time=2023-04-28 16:17:20
