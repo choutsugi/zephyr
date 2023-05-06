@@ -3,7 +3,6 @@ package rotatelog
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io"
 	"testing"
 	"time"
 )
@@ -20,15 +19,32 @@ func TestRotateLog(t *testing.T) {
 		return lvl >= zapcore.ErrorLevel
 	})
 
-	debugWriter, err := newWriter("./log/log.debug.20060102", "./log/log.debug", time.Hour*24, time.Hour*24*7, "./log/log.debug.*")
+	debugWriter, err := NewRotateLog(
+		"./log/log.debug.20060102",
+		WithRotateTime(time.Hour*24),
+		WithCurLogLinkPath("./log/log.debug"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.debug.*"),
+	)
 	if err != nil {
 		panic(err)
 	}
-	infoWriter, err := newWriter("./log/log.info.20060102", "./log/log.info", time.Hour*24, time.Hour*24*7, "./log/log.info.*")
+
+	infoWriter, err := NewRotateLog(
+		"./log/log.info.20060102",
+		WithRotateTime(time.Hour*24),
+		WithCurLogLinkPath("./log/log.info"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.info.*"),
+	)
 	if err != nil {
 		panic(err)
 	}
-	errorWriter, err := newWriter("./log/log.error.20060102", "./log/log.error", time.Hour*24, time.Hour*24*7, "./log/log.error.*")
+
+	errorWriter, err := NewRotateLog(
+		"./log/log.error.20060102",
+		WithRotateTime(time.Hour*24),
+		WithCurLogLinkPath("./log/log.error"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.error.*"),
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -47,20 +63,6 @@ func TestRotateLog(t *testing.T) {
 		log.Error("hello", zap.String("time", time.Now().Format(time.DateTime)))
 		log.Fatal("hello", zap.String("time", time.Now().Format(time.DateTime)))
 	}
-}
-
-func newWriter(logPath, linkPath string, rotateTime time.Duration, maxAge time.Duration, fileWildcard string) (io.Writer, error) {
-	writer, err := NewRotateLog(
-		logPath,
-		WithRotateTime(rotateTime),
-		WithCurLogLinkPath(linkPath),
-		WithDeleteExpiredFile(maxAge, fileWildcard),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return writer, nil
 }
 
 func getJsonEncoder() zapcore.Encoder {
