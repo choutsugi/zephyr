@@ -4,26 +4,42 @@ import (
 	"time"
 )
 
-type Option func(*RotateLog)
+type OptFunc func(opts *Opts)
 
-func WithRotateTime(duration time.Duration) Option {
-	return func(r *RotateLog) {
-		r.rotateTime = duration
+type Opts struct {
+	curLogLinkPath  string
+	delFileWildcard string
+	rotateTime      time.Duration
+	maxAge          time.Duration
+	maxFileSize     int64
+}
+
+func defaultOpts() Opts {
+	return Opts{
+		rotateTime:  time.Hour * 24,
+		maxAge:      time.Hour * 24 * 7,
+		maxFileSize: 1024 * 1024 * 50,
 	}
 }
 
-func WithCurLogLinkPath(linkPath string) Option {
-	return func(r *RotateLog) {
-		r.curLogLinkPath = linkPath
+func WithRotateTime(duration time.Duration) OptFunc {
+	return func(o *Opts) {
+		o.rotateTime = duration
+	}
+}
+
+func WithCurLogLinkPath(linkPath string) OptFunc {
+	return func(o *Opts) {
+		o.curLogLinkPath = linkPath
 	}
 }
 
 // WithDeleteExpiredFile Judge expired by last modify time
 // cutoffTime = now - maxAge
 // Only delete satisfying file wildcard filename
-func WithDeleteExpiredFile(maxAge time.Duration, fileWildcard string) Option {
-	return func(r *RotateLog) {
-		r.maxAge = maxAge
-		r.delFileWildcard = fileWildcard
+func WithDeleteExpiredFile(maxAge time.Duration, fileWildcard string) OptFunc {
+	return func(o *Opts) {
+		o.maxAge = maxAge
+		o.delFileWildcard = fileWildcard
 	}
 }

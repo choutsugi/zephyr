@@ -15,28 +15,27 @@ import (
 )
 
 type RotateLog struct {
-	file            *os.File
-	fileSize        int64
-	logPath         string
-	curLogLinkPath  string
-	rotateTime      time.Duration
-	maxAge          time.Duration
-	maxFileSize     int64
-	delFileWildcard string
-	mutex           *sync.Mutex
-	rotate          <-chan time.Time // notify rotate event
-	close           chan struct{}    // close file and write goroutine
+	logPath  string
+	file     *os.File
+	fileSize int64
+	mutex    *sync.Mutex
+	rotate   <-chan time.Time // notify rotate event
+	close    chan struct{}    // close file and write goroutine
+	opts     Opts
 }
 
-func NewRotateLog(logPath string, opts ...Option) (*RotateLog, error) {
-	rl := &RotateLog{
-		mutex:       &sync.Mutex{},
-		close:       make(chan struct{}, 1),
-		logPath:     logPath,
-		maxFileSize: 1024 * 1024 * 50,
+func NewRotateLog(logPath string, opts ...OptFunc) (*RotateLog, error) {
+
+	o := defaultOpts()
+	for _, fn := range opts {
+		fn(&o)
 	}
-	for _, opt := range opts {
-		opt(rl)
+
+	rl := &RotateLog{
+		logPath: logPath,
+		mutex:   &sync.Mutex{},
+		close:   make(chan struct{}, 1),
+		opts:    o,
 	}
 
 	if err := os.Mkdir(filepath.Dir(rl.logPath), 0755); err != nil && !os.IsExist(err) {
@@ -47,7 +46,7 @@ func NewRotateLog(logPath string, opts ...Option) (*RotateLog, error) {
 		return nil, err
 	}
 
-	if rl.rotateTime != 0 {
+	if rl.opts.rotateTime != 0 {
 		go rl.handleEvent()
 	}
 
@@ -57,10 +56,10 @@ func NewRotateLog(logPath string, opts ...Option) (*RotateLog, error) {
 func (r *RotateLog) Write(bytes []byte) (int, error) {
 
 	writeLen := int64(len(bytes))
-	if writeLen > r.maxFileSize {
-		return 0, errors.Errorf("write length %d exceeds max file size %d", writeLen, r.maxFileSize)
+	if writeLen > r.opts.maxFileSize {
+		return 0, errors.Errorf("write length %d exceeds max file size %d", writeLen, r.opts.maxFileSize)
 	}
-	if r.fileSize+writeLen > r.maxFileSize {
+	if r.fileSize+writeLen > r.opts.maxFileSize {
 		if err := r.rotateFileBySize(); err != nil {
 			return 0, err
 		}
@@ -90,8 +89,8 @@ func (r *RotateLog) handleEvent() {
 }
 
 func (r *RotateLog) rotateFileByTime(now time.Time) error {
-	if r.rotateTime != 0 {
-		nextRotateTime := r.calRotateTimeDuration(now, r.rotateTime)
+	if r.opts.rotateTime != 0 {
+		nextRotateTime := r.calRotateTimeDuration(now, r.opts.rotateTime)
 		r.rotate = time.After(nextRotateTime)
 	}
 
@@ -112,12 +111,12 @@ func (r *RotateLog) rotateFileByTime(now time.Time) error {
 	}
 	r.fileSize = stat.Size()
 
-	if len(r.curLogLinkPath) > 0 {
-		_ = os.Remove(r.curLogLinkPath)
-		_ = os.Link(latestLogPath, r.curLogLinkPath)
+	if len(r.opts.curLogLinkPath) > 0 {
+		_ = os.Remove(r.opts.curLogLinkPath)
+		_ = os.Link(latestLogPath, r.opts.curLogLinkPath)
 	}
 
-	if r.maxAge > 0 && len(r.delFileWildcard) > 0 {
+	if r.opts.maxAge > 0 && len(r.opts.delFileWildcard) > 0 {
 		go r.deleteExpiredFile(now)
 	}
 
@@ -189,12 +188,12 @@ func (r *RotateLog) rotateFileBySize() error {
 	}
 	r.fileSize = stat.Size()
 
-	if len(r.curLogLinkPath) > 0 {
-		_ = os.Remove(r.curLogLinkPath)
-		_ = os.Link(latestLogPath, r.curLogLinkPath)
+	if len(r.opts.curLogLinkPath) > 0 {
+		_ = os.Remove(r.opts.curLogLinkPath)
+		_ = os.Link(latestLogPath, r.opts.curLogLinkPath)
 	}
 
-	if r.maxAge > 0 && len(r.delFileWildcard) > 0 {
+	if r.opts.maxAge > 0 && len(r.opts.delFileWildcard) > 0 {
 		go r.deleteExpiredFile(time.Now())
 	}
 
@@ -203,8 +202,8 @@ func (r *RotateLog) rotateFileBySize() error {
 
 // Judge expired by last modify time
 func (r *RotateLog) deleteExpiredFile(now time.Time) {
-	cutoffTime := now.Add(-r.maxAge)
-	matches, err := filepath.Glob(r.delFileWildcard)
+	cutoffTime := now.Add(-r.opts.maxAge)
+	matches, err := filepath.Glob(r.opts.delFileWildcard)
 	if err != nil {
 		return
 	}
@@ -216,11 +215,11 @@ func (r *RotateLog) deleteExpiredFile(now time.Time) {
 			continue
 		}
 
-		if r.maxAge > 0 && fileInfo.ModTime().After(cutoffTime) {
+		if r.opts.maxAge > 0 && fileInfo.ModTime().After(cutoffTime) {
 			continue
 		}
 
-		if len(r.curLogLinkPath) > 0 && fileInfo.Name() == filepath.Base(r.curLogLinkPath) {
+		if len(r.opts.curLogLinkPath) > 0 && fileInfo.Name() == filepath.Base(r.opts.curLogLinkPath) {
 			continue
 		}
 		toUnlink = append(toUnlink, path)

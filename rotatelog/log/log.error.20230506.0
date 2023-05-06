@@ -1,2 +1,2 @@
-{"level":"ERROR","time":"2023-05-06T16:28:39.669+0800","caller":"rotatelog/rotatelog_test.go:63","msg":"hello","time":"2023-05-06 16:28:39"}
-{"level":"FATAL","time":"2023-05-06T16:28:39.669+0800","caller":"rotatelog/rotatelog_test.go:64","msg":"hello","time":"2023-05-06 16:28:39"}
+{"level":"ERROR","time":"2023-05-06T18:34:26.822+0800","caller":"rotatelog/rotatelog_test.go:63","msg":"hello","time":"2023-05-06 18:34:26"}
+{"level":"FATAL","time":"2023-05-06T18:34:26.823+0800","caller":"rotatelog/rotatelog_test.go:64","msg":"hello","time":"2023-05-06 18:34:26"}
