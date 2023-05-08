@@ -28,6 +28,12 @@ func WithRotateTime(duration time.Duration) OptFunc {
 	}
 }
 
+func WithMaxFileSize(size int64) OptFunc {
+	return func(o *Opts) {
+		o.maxFileSize = size
+	}
+}
+
 func WithCurLogLinkPath(linkPath string) OptFunc {
 	return func(o *Opts) {
 		o.curLogLinkPath = linkPath

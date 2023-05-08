@@ -1,5 +1,0 @@
-2023-05-06T18:34:26.822+0800	DEBUG	rotatelog/rotatelog_test.go:60	hello	{"time": "2023-05-06 18:34:26"}
-2023-05-06T18:34:26.822+0800	INFO	rotatelog/rotatelog_test.go:61	hello	{"time": "2023-05-06 18:34:26"}
-2023-05-06T18:34:26.822+0800	WARN	rotatelog/rotatelog_test.go:62	hello	{"time": "2023-05-06 18:34:26"}
-2023-05-06T18:34:26.822+0800	ERROR	rotatelog/rotatelog_test.go:63	hello	{"time": "2023-05-06 18:34:26"}
-2023-05-06T18:34:26.823+0800	FATAL	rotatelog/rotatelog_test.go:64	hello	{"time": "2023-05-06 18:34:26"}

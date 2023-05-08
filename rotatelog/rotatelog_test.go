@@ -20,30 +20,33 @@ func TestRotateLog(t *testing.T) {
 	})
 
 	debugWriter, err := NewRotateLog(
-		"./log/log.debug.20060102",
+		"./log/debug/log.debug.20060102",
 		WithRotateTime(time.Hour*24),
+		WithMaxFileSize(1024*1024*20),
 		WithCurLogLinkPath("./log/log.debug"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.debug.*.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/debug/log.debug.*.*"),
 	)
 	if err != nil {
 		panic(err)
 	}
 
 	infoWriter, err := NewRotateLog(
-		"./log/log.info.20060102",
+		"./log/info/log.info.20060102",
 		WithRotateTime(time.Hour*24),
+		WithMaxFileSize(1024*1024*20),
 		WithCurLogLinkPath("./log/log.info"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.info.*.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/info/log.info.*.*"),
 	)
 	if err != nil {
 		panic(err)
 	}
 
 	errorWriter, err := NewRotateLog(
-		"./log/log.error.20060102",
+		"./log/error/log.error.20060102",
 		WithRotateTime(time.Hour*24),
+		WithMaxFileSize(1024*1024*20),
 		WithCurLogLinkPath("./log/log.error"),
-		WithDeleteExpiredFile(time.Hour*24*7, "./log/log.error.*.*"),
+		WithDeleteExpiredFile(time.Hour*24*7, "./log/error/log.error.*.*"),
 	)
 	if err != nil {
 		panic(err)
@@ -56,12 +59,12 @@ func TestRotateLog(t *testing.T) {
 	)
 
 	log := zap.New(core, zap.AddCaller())
-	{
+	for {
 		log.Debug("hello", zap.String("time", time.Now().Format(time.DateTime)))
 		log.Info("hello", zap.String("time", time.Now().Format(time.DateTime)))
 		log.Warn("hello", zap.String("time", time.Now().Format(time.DateTime)))
 		log.Error("hello", zap.String("time", time.Now().Format(time.DateTime)))
-		log.Fatal("hello", zap.String("time", time.Now().Format(time.DateTime)))
+		//log.Fatal("hello", zap.String("time", time.Now().Format(time.DateTime)))
 	}
 }
 
