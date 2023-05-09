@@ -1,4 +1,4 @@
-module github.com/kevyncheung/zephyr
+module github.com/luvcurt/zephyr
 
 go 1.19
 

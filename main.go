@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/kevyncheung/zephyr/sugar/rand"
+	"github.com/luvcurt/zephyr/sugar/rand"
 )
 
 func main() {
