@@ -14,7 +14,6 @@ func Samples(original []any, k int) []any {
 	samples := make([]any, k)
 	for i, idx := range indices {
 		samples[i] = items[idx]
-		items[idx], items[length-1-i] = items[length-1-i], items[idx]
 	}
 	return samples
 }
